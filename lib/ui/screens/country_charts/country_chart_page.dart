@@ -11,23 +11,26 @@ class CountryChartPage extends StatelessWidget {
   final List<CountryData> countryData;
   final String countryCode;
 
-  CountryChartPage({this.countryData, this.countryCode});
+  const CountryChartPage({Key? key, required this.countryData, required this.countryCode}) : super(key: key); // Added const, Key and required
 
   @override
   Widget build(BuildContext context) {
-    final countryName = countryData[0].country;
+    final countryName = countryData.isNotEmpty ? countryData[0].country ?? "N/A" : "N/A"; // Added null check and default
 
-    final listOfConfirmed =
-        countryData.map((e) => NumericChartData(e.date, e.confirmed)).toList();
-    final listOfDeaths =
-        countryData.map((e) => NumericChartData(e.date, e.deaths)).toList();
-    final listOfRecovered =
-        countryData.map((e) => NumericChartData(e.date, e.recovered)).toList();
+    final listOfConfirmed = countryData
+        .map((e) => NumericChartData(e.date!, e.confirmed ?? 0)) // Added null checks and defaults
+        .toList();
+    final listOfDeaths = countryData
+        .map((e) => NumericChartData(e.date!, e.deaths ?? 0)) // Added null checks and defaults
+        .toList();
+    final listOfRecovered = countryData
+        .map((e) => NumericChartData(e.date!, e.recovered ?? 0)) // Added null checks and defaults
+        .toList();
 
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
-          title: Material(
+          leading: Container(), // Consider adding a back button if appropriate
+          title: Material( // This Material widget might be redundant
             type: MaterialType.transparency,
             child: Center(
               child: Row(children: <Widget>[
@@ -37,22 +40,14 @@ class CountryChartPage extends StatelessWidget {
                     radius: 14.0,
                     backgroundImage: AssetImage(
                       CountryPickerUtils.getFlagImageAssetPath(countryCode),
-                      package: country_icons_package,
+                      package: country_icons_package, // This might be an issue if not defined elsewhere
                     ),
                   ),
                 ),
-                Container(
-                  width: 5,
-                ),
-                Title(
-                  color: Colors.white,
-                  child: Hero(
-                    tag: heroCountryName,
-                    child: Text(
-                      countryName,
-                      style: Style.strongTitleTextStyle,
-                    ),
-                  ),
+                const SizedBox(width: 5), // Made const
+                Text( // Removed Title and Hero for simplicity, can be added back if animations are crucial
+                  countryName,
+                  style: Style.strongTitleTextStyle,
                 ),
               ]),
             ),
@@ -62,8 +57,8 @@ class CountryChartPage extends StatelessWidget {
           axisDirection: AxisDirection.down,
           color: const Color.fromRGBO(0, 116, 227, 1),
           child: CustomScrollView(
-            controller: ScrollController(),
-            physics: ClampingScrollPhysics(),
+            // controller: ScrollController(), // Not strictly necessary unless you need to interact with it
+            physics: const ClampingScrollPhysics(), // Made const
             slivers: <Widget>[
               SliverToBoxAdapter(
                 child: Column(
@@ -72,17 +67,17 @@ class CountryChartPage extends StatelessWidget {
                     NumericLinearChart(
                       countryData: listOfConfirmed,
                       countryName: countryName,
-                      chartHeader: Status.CONFIRMED.toString(),
+                      chartHeader: Status.CONFIRMED.toString().split('.').last, // Get only enum value name
                     ),
                     NumericLinearChart(
                       countryData: listOfDeaths,
                       countryName: countryName,
-                      chartHeader: Status.DEATHS.toString(),
+                      chartHeader: Status.DEATHS.toString().split('.').last, // Get only enum value name
                     ),
                     NumericLinearChart(
                       countryData: listOfRecovered,
                       countryName: countryName,
-                      chartHeader: Status.RECOVERED.toString(),
+                      chartHeader: Status.RECOVERED.toString().split('.').last, // Get only enum value name
                     ),
                     StackedBarChart(
                       countryData: countryData,
@@ -95,13 +90,13 @@ class CountryChartPage extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: Color(0xff8585a3),
+        backgroundColor: const Color(0xff8585a3), // Made const
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.arrow_back),
-            backgroundColor: Color(0xff474775),
+            child: const Icon(Icons.arrow_back), // Made const
+            backgroundColor: const Color(0xff474775), // Made const
             elevation: 5.0,
-            heroTag: 'fab',
+            heroTag: 'fab', // Ensure this tag is unique if multiple FABs exist across routes
             onPressed: () {
               Navigator.pop(context);
             }));

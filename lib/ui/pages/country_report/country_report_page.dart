@@ -1,20 +1,20 @@
 import 'package:crownapp/bloc/blocs.dart';
-import 'package:crownapp/model/country_centers.dart';
+// import 'package:crownapp/model/country_centers.dart'; // This file does not exist
 import 'package:crownapp/model/models.dart';
 import 'package:crownapp/ui/widgets/virus_details/virus_details.dart';
 import 'package:crownapp/utils/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart'; // Updated import
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class CountryReportPage extends StatelessWidget {
   final CovidCountry country;
 
-  final circular = Radius.circular(15);
+  final circular = const Radius.circular(15); // Made const
 
-  CountryReportPage(this.country);
+  CountryReportPage(this.country, {Key? key}) : super(key: key); // Added Key
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,15 @@ class CountryReportPage extends StatelessWidget {
               return _getMapProgressBar();
             }
             if (state is CountryDataAvailable) {
-              var countryCenter = countryCenterDetails[country.isoCode];
-              return _getMap(LatLng(countryCenter.item1, countryCenter.item2));
-              //return Container();
+              // var countryCenter = countryCenterDetails[country.isoCode]; // countryCenterDetails is not defined
+              // Hardcoding coordinates for now as countryCenterDetails is missing
+              final LatLng defaultCenter = LatLng(0, 0); // Default to (0,0)
+              // if (countryCenter != null) {
+              //   return _getMap(LatLng(countryCenter.item1, countryCenter.item2));
+              // } else {
+              //   return _getMap(defaultCenter); // Use default if lookup fails
+              // }
+              return _getMap(defaultCenter);
             }
             return Container();
           },

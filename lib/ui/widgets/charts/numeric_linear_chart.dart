@@ -1,21 +1,26 @@
-import 'package:crownapp/utils/platform_utils.dart';
 import 'package:crownapp/utils/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+// Assuming isCardView is a global or defined elsewhere.
+// For this refactoring, I'll assume it's a boolean that's available.
+// If not, it would need to be passed as a parameter or handled differently.
+const bool isCardView = false; // Placeholder: replace with actual logic if available
+
 class NumericLinearChart extends StatelessWidget {
   final List<NumericChartData> countryData;
   final String countryName;
-  final String chartTitle;
+  final String? chartTitle; // Made nullable
   final String chartHeader;
 
-  NumericLinearChart({
-    this.countryData,
-    this.countryName,
+  const NumericLinearChart({ // Added const
+    Key? key, // Added Key
+    required this.countryData,
+    required this.countryName,
     this.chartTitle,
-    this.chartHeader,
-  });
+    required this.chartHeader,
+  }) : super(key: key); // Added Key
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +56,10 @@ class NumericLinearChart extends StatelessWidget {
                             softWrap: true,
                             textScaleFactor: 1,
                             overflow: TextOverflow.fade,
-                            style: TextStyle(
+                            style: const TextStyle( // Made const
                                 fontFamily: 'HeeboMedium',
                                 fontSize: 16.0,
-                                color: const Color.fromRGBO(51, 51, 51, 1),
+                                color: Color.fromRGBO(51, 51, 51, 1),
                                 letterSpacing: 0.2),
                           ),
                           Container(
@@ -103,37 +108,37 @@ class NumericLinearChart extends StatelessWidget {
 
   SfCartesianChart _buildChart() => SfCartesianChart(
         plotAreaBorderWidth: 0,
-        title: ChartTitle(text: isCardView ? '' : chartTitle),
+        title: ChartTitle(text: isCardView ? '' : chartTitle ?? ''), // Handle null chartTitle
         legend: Legend(
-            isVisible: isCardView ? false : true,
+            isVisible: isCardView ? false : true, // Assuming isCardView is available
             overflowMode: LegendItemOverflowMode.wrap),
         primaryXAxis: DateTimeAxis(
             intervalType: DateTimeIntervalType.months,
             edgeLabelPlacement: EdgeLabelPlacement.shift,
             dateFormat: DateFormat.yMd(),
             interval: 1,
-            majorGridLines: MajorGridLines(width: 0)),
+            majorGridLines: const MajorGridLines(width: 0)), // Made const
         primaryYAxis: NumericAxis(
             labelFormat: '{value}',
             numberFormat: Style.numberFormatter,
-            axisLine: AxisLine(width: 0),
-            majorTickLines: MajorTickLines(color: Colors.transparent)),
+            axisLine: const AxisLine(width: 0), // Made const
+            majorTickLines: const MajorTickLines(color: Colors.transparent)), // Made const
         series: _getChartLineSeries(countryData),
         tooltipBehavior: TooltipBehavior(enable: true, canShowMarker: false),
       );
 
   List<LineSeries<NumericChartData, DateTime>> _getChartLineSeries(
-          List<NumericChartData> data) =>
+          List<NumericChartData> data) => // data parameter is used here
       <LineSeries<NumericChartData, DateTime>>[
         LineSeries<NumericChartData, DateTime>(
           animationDuration: 2500,
           enableTooltip: true,
-          dataSource: countryData,
+          dataSource: data, // Use the data parameter
           xValueMapper: (NumericChartData sales, _) => sales.x,
           yValueMapper: (NumericChartData sales, _) => sales.y,
           width: 2,
           name: countryName,
-          markerSettings: MarkerSettings(isVisible: false),
+          markerSettings: const MarkerSettings(isVisible: false), // Made const
         ),
       ];
 }

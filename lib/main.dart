@@ -5,16 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/splash/splash_bloc.dart';
 
-class SimpleBlocDelegate extends BlocDelegate {
+class SimpleBlocObserver extends BlocObserver { // Renamed from BlocDelegate
   @override
-  void onTransition(Bloc bloc, Transition transition) {
+  void onTransition(Bloc<dynamic, dynamic> bloc, Transition<dynamic, dynamic> transition) { // Added types
     super.onTransition(bloc, transition);
     print(transition);
   }
 }
 
 void main() {
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocObserver(); // Updated to use Bloc.observer
   runApp(MyApp());
 }
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: _createMaterialColor(
-          Color(0xFF333366),
+          const Color(0xFF333366), // Made const
         ),
       ),
       home: BlocProvider(
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
 
   MaterialColor _createMaterialColor(Color color) {
     List strengths = <double>[.05];
-    Map swatch = <int, Color>{};
+    Map<int, Color> swatch = <int, Color>{}; // Typed the map
     final int r = color.red, g = color.green, b = color.blue;
 
     for (int i = 1; i < 10; i++) {

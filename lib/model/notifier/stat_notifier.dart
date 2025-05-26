@@ -2,9 +2,9 @@ import 'package:crownapp/utils/pair.dart';
 import 'package:flutter/material.dart';
 
 class StatNotifier with ChangeNotifier {
-  Pair<DateTime, int> _selectedDate;
+  late Pair<DateTime, int> _selectedDate; // Initialized with late
 
-  get selectedDate => _selectedDate;
+  Pair<DateTime, int> get selectedDate => _selectedDate; // Explicitly typed getter
 
   set selectedDate(Pair<DateTime, int> newSelectedDate) {
     _selectedDate = newSelectedDate;

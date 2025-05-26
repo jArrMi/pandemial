@@ -1,4 +1,4 @@
-import 'package:country_pickers/country_pickers.dart';
+import 'package:country_pickers/country_pickers.dart'; // Used CountryPickerUtils
 import 'package:crownapp/bloc/chart/country_chart_bloc.dart';
 import 'package:crownapp/model/models.dart';
 import 'package:crownapp/repository/country_data_repository.dart';
@@ -6,7 +6,7 @@ import 'package:crownapp/ui/screens/country_charts/country_chart_page.dart';
 import 'package:crownapp/utils/crown_app_icons.dart';
 import 'package:crownapp/utils/platform_utils.dart';
 import 'package:crownapp/utils/text_style.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart'; // Unnecessary import
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -15,40 +15,45 @@ class VirusDetails extends StatelessWidget {
   final List<CountryData> countryData;
   final String countryCode;
 
-  VirusDetails({this.countryData, this.countryCode});
+  const VirusDetails({Key? key, required this.countryData, required this.countryCode}) : super(key: key); // Added const and Key
 
   @override
   Widget build(BuildContext context) {
-    final latestReport = countryData[countryData.length - 1];
-    final latestUpdate = latestReport.date;
-    final latestActive = latestReport.active;
-    final latestConfirmed = latestReport.confirmed;
-    final latestDeaths = latestReport.deaths;
-    final latestRecovered = latestReport.recovered;
+    // Handle cases where countryData might be empty or null
+    if (countryData.isEmpty) {
+      return const Center(child: Text("No data available")); // Or a loading indicator
+    }
+    final latestReport = countryData.last;
+    final latestUpdate = latestReport.date; // Already nullable in CountryData
+    final latestActive = latestReport.active ?? 0;
+    final latestConfirmed = latestReport.confirmed ?? 0;
+    final latestDeaths = latestReport.deaths ?? 0;
+    final latestRecovered = latestReport.recovered ?? 0;
+    final countryName = latestReport.country ?? "N/A";
 
     // Country Details
     final virusDetails = Container(
-      margin: EdgeInsets.fromLTRB(
+      margin: const EdgeInsets.fromLTRB( // Made const
         30.0,
         16.0,
         16.0,
         7.5,
       ),
-      constraints: BoxConstraints.expand(),
+      constraints: const BoxConstraints.expand(), // Made const
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(height: 1),
+          const SizedBox(height: 1), // Made const
           Padding(
-            padding: EdgeInsets.only(left: 26.0),
+            padding: const EdgeInsets.only(left: 26.0), // Made const
             child: Align(
               alignment: Alignment.centerLeft,
               child: Column(
                 children: <Widget>[
                   Hero(
-                    tag: heroCountryName,
+                    tag: heroCountryName, // Assuming heroCountryName is a const defined elsewhere
                     child: Text(
-                      latestReport.country,
+                      countryName,
                       style: Style.strongTitleTextStyle,
                     ),
                   ),
@@ -60,7 +65,7 @@ class VirusDetails extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10), // Made const
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -80,23 +85,24 @@ class VirusDetails extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8), // Made const
           Padding(
-            padding: EdgeInsets.only(left: 1.0),
+            padding: const EdgeInsets.only(left: 1.0), // Made const
             child: Text(
-              'Last update: ${DateFormat("dd-MM-yyyy").format(latestUpdate)}',
+              // Handle null latestUpdate
+              'Last update: ${latestUpdate != null ? DateFormat("dd-MM-yyyy").format(latestUpdate) : "N/A"}',
               style: Style.commonTextStyle,
             ),
           ),
           GestureDetector(
-            child: Padding(
+            child: Padding( // Removed const
               padding: EdgeInsets.only(left: 1.0),
               child: Text(
                 'View more details',
                 style: Style.hyperlink,
               ),
             ),
-            onTap: () => {
+            onTap: () => { // Keep the original arrow function for onTap
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -132,16 +138,14 @@ class VirusDetails extends StatelessWidget {
     );
   }
 
-  Widget _statDetail({String value, IconData image}) => Column(
+  Widget _statDetail({required String value, required IconData image}) => Column( // Made parameters required
         children: <Widget>[
           Icon(
             image,
             size: 36.0,
             color: Colors.white,
           ),
-          SizedBox(
-            height: 3.0,
-          ),
+          const SizedBox(height: 3.0), // Made const
           Text(
             value,
             textAlign: TextAlign.center,
@@ -151,9 +155,9 @@ class VirusDetails extends StatelessWidget {
       );
 
   Widget _getCardDecoration(Widget child) => Container(
-        constraints: BoxConstraints.expand(),
+        constraints: const BoxConstraints.expand(), // Made const
         child: child,
-        margin: EdgeInsets.only(
+        margin: const EdgeInsets.only( // Made const
           left: 47.5,
         ),
         decoration: BoxDecoration(
@@ -162,7 +166,7 @@ class VirusDetails extends StatelessWidget {
           borderRadius: BorderRadius.circular(
             8.0,
           ),
-          boxShadow: <BoxShadow>[
+          boxShadow: const <BoxShadow>[ // Made const
             BoxShadow(
               color: Colors.black12,
               blurRadius: 10.0,
@@ -173,17 +177,17 @@ class VirusDetails extends StatelessWidget {
       );
 
   Widget _getCountryIcon(String countryIsoCode) => Container(
-        padding: EdgeInsets.only(top: 10.0),
+        padding: const EdgeInsets.only(top: 10.0), // Made const
         height: 95.0,
         width: 95.0,
         child: Center(
           child: Hero(
-            tag: heroCountryFlag,
+            tag: heroCountryFlag, // Assuming heroCountryFlag is a const defined elsewhere
             child: CircleAvatar(
               radius: 42.0,
               backgroundImage: AssetImage(
                 CountryPickerUtils.getFlagImageAssetPath(countryIsoCode),
-                package: country_icons_package,
+                package: CountryPickerUtils.countryPickerUtilsPackageName, // Corrected package name
               ),
             ),
           ),

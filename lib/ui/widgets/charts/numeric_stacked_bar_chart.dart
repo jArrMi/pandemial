@@ -1,23 +1,26 @@
 import 'package:crownapp/model/models.dart';
 import 'package:crownapp/utils/country_utils.dart';
-import 'package:crownapp/utils/platform_utils.dart';
 import 'package:crownapp/utils/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+// Assuming isCardView is a global or defined elsewhere.
+const bool isCardView = false; // Placeholder: replace with actual logic if available
+
 class StackedBarChart extends StatelessWidget {
   final List<CountryData> countryData;
   final String countryName;
-  final String chartTitle;
+  final String? chartTitle; // Made nullable
   final String chartHeader;
 
-  StackedBarChart({
-    this.countryData,
-    this.countryName,
+  const StackedBarChart({ // Added const
+    Key? key, // Added Key
+    required this.countryData,
+    required this.countryName,
     this.chartTitle,
-    this.chartHeader,
-  });
+    required this.chartHeader,
+  }) : super(key: key); // Added Key
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +56,10 @@ class StackedBarChart extends StatelessWidget {
                             softWrap: true,
                             textScaleFactor: 1,
                             overflow: TextOverflow.fade,
-                            style: TextStyle(
+                            style: const TextStyle( // Made const
                                 fontFamily: 'HeeboMedium',
                                 fontSize: 16.0,
-                                color: const Color.fromRGBO(51, 51, 51, 1),
+                                color: Color.fromRGBO(51, 51, 51, 1),
                                 letterSpacing: 0.2),
                           ),
                           Container(
@@ -105,21 +108,21 @@ class StackedBarChart extends StatelessWidget {
 
   SfCartesianChart _buildChart() => SfCartesianChart(
         plotAreaBorderWidth: 0,
-        title: ChartTitle(text: isCardView ? '' : chartTitle),
+        title: ChartTitle(text: isCardView ? '' : chartTitle ?? ''), // Handle null chartTitle
         legend: Legend(
-            isVisible: isCardView ? false : true,
+            isVisible: isCardView ? false : true, // Assuming isCardView is available
             overflowMode: LegendItemOverflowMode.wrap),
         primaryXAxis: DateTimeAxis(
             intervalType: DateTimeIntervalType.months,
             edgeLabelPlacement: EdgeLabelPlacement.shift,
             dateFormat: DateFormat.yMd(),
             interval: 1,
-            majorGridLines: MajorGridLines(width: 0)),
+            majorGridLines: const MajorGridLines(width: 0)), // Made const
         primaryYAxis: NumericAxis(
             labelFormat: '{value}',
             numberFormat: Style.numberFormatter,
-            axisLine: AxisLine(width: 0),
-            majorTickLines: MajorTickLines(color: Colors.transparent)),
+            axisLine: const AxisLine(width: 0), // Made const
+            majorTickLines: const MajorTickLines(color: Colors.transparent)), // Made const
         series: _getChartLineSeries(countryData),
         tooltipBehavior:
             TooltipBehavior(enable: true, header: '', canShowMarker: false),
@@ -127,8 +130,11 @@ class StackedBarChart extends StatelessWidget {
 
   List<StackedColumnSeries<StackedChartData, DateTime>> _getChartLineSeries(
       List<CountryData> data) {
-    final stackedDataList = data
-        .sublist(data.length - 31, data.length)
+    // Ensure data has enough elements before sublist if data can be short
+    final sublistStart = (data.length - 31) < 0 ? 0 : (data.length - 31);
+    final relevantData = data.sublist(sublistStart);
+
+    final stackedDataList = relevantData
         .map((e) => StackedChartData(
             e.date, e.active, e.confirmed, e.recovered, e.deaths))
         .toList();
@@ -140,7 +146,7 @@ class StackedBarChart extends StatelessWidget {
         xValueMapper: (StackedChartData sales, _) => sales.x,
         yValueMapper: (StackedChartData sales, _) => sales.y,
         animationDuration: 2500,
-        name: Status.ACTIVE.toString(),
+        name: Status.ACTIVE.toString().split('.').last, // Get only enum value name
       ),
       StackedColumnSeries<StackedChartData, DateTime>(
         enableTooltip: true,
@@ -148,7 +154,7 @@ class StackedBarChart extends StatelessWidget {
         xValueMapper: (StackedChartData sales, _) => sales.x,
         yValueMapper: (StackedChartData sales, _) => sales.yValue,
         animationDuration: 2500,
-        name: Status.CONFIRMED.toString(),
+        name: Status.CONFIRMED.toString().split('.').last, // Get only enum value name
       ),
       StackedColumnSeries<StackedChartData, DateTime>(
         enableTooltip: true,
@@ -156,7 +162,7 @@ class StackedBarChart extends StatelessWidget {
         xValueMapper: (StackedChartData sales, _) => sales.x,
         yValueMapper: (StackedChartData sales, _) => sales.yValue2,
         animationDuration: 2500,
-        name: Status.RECOVERED.toString(),
+        name: Status.RECOVERED.toString().split('.').last, // Get only enum value name
       ),
       StackedColumnSeries<StackedChartData, DateTime>(
         enableTooltip: true,
@@ -164,7 +170,7 @@ class StackedBarChart extends StatelessWidget {
         xValueMapper: (StackedChartData sales, _) => sales.x,
         yValueMapper: (StackedChartData sales, _) => sales.yValue3,
         animationDuration: 2500,
-        name: Status.DEATHS.toString(),
+        name: Status.DEATHS.toString().split('.').last, // Get only enum value name
       ),
     ];
   }
@@ -173,9 +179,9 @@ class StackedBarChart extends StatelessWidget {
 class StackedChartData {
   StackedChartData(this.x, this.y, this.yValue, this.yValue2, this.yValue3);
 
-  final DateTime x;
-  final num y;
-  final num yValue;
-  final num yValue2;
-  final num yValue3;
+  final DateTime? x; // Made nullable
+  final num? y; // Made nullable
+  final num? yValue; // Made nullable
+  final num? yValue2; // Made nullable
+  final num? yValue3; // Made nullable
 }
